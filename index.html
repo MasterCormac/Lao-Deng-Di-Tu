@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Metro Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 100vh;  /* Map takes the full viewport height */
+    }
+    #station-details {
+      display: none; /* 默认情况下隐藏详细信息 */
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: white;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- 详细信息区域 -->
+<div id="station-details">
+  <h1 id="station-name"></h1>
+  <p id="station-info"></p>
+  <button onclick="goBack()">返回地图</button>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  // 初始化地图，并设置视图和初始缩放级别
+  var map = L.map('map', {
+    crs: L.CRS.Simple,  // 简单坐标系，用于非地理地图
+    minZoom: -1,
+    maxZoom: 1
+  }).setView([0.5, 0.5], 0);  // 中心点设置在[0.5, 0.5]，zoom level = 0
+
+  // 图片地图的边界
+  var bounds = [[0, 0], [1, 1]];  // 左下和右上的相对坐标
+
+  // 加载地铁图片作为背景
+  var image = L.imageOverlay('xianluda.jpeg', bounds).addTo(map);
+
+  // 设置缩放边界
+  map.fitBounds(bounds);
+
+  // 添加站点标记
+  var stations = [
+    { name: "站点1", x: 0.2, y: 0.3, info: "这是站点1的详细信息" },
+    { name: "站点2", x: 0.5, y: 0.6, info: "这是站点2的详细信息" },
+    { name: "站点3", x: 0.7, y: 0.8, info: "这是站点3的详细信息" }
+  ];
+
+  // 循环添加每个站点的标记
+  stations.forEach(function(station) {
+    var marker = L.marker([station.y, station.x]).addTo(map)
+      .bindPopup(station.name);  // 绑定弹出框
+    
+    // 添加点击事件
+    marker.on('click', function() {
+      showStationDetails(station);
+    });
+  });
+
+  // 显示站点详细信息
+  function showStationDetails(station) {
+    document.getElementById('map').style.display = 'none';  // 隐藏地图
+    document.getElementById('station-details').style.display = 'block';  // 显示详细信息
+    document.getElementById('station-name').innerText = station.name;
+    document.getElementById('station-info').innerText = station.info;
+  }
+
+  // 返回地图视图
+  function goBack() {
+    document.getElementById('station-details').style.display = 'none';  // 隐藏详细信息
+    document.getElementById('map').style.display = 'block';  // 显示地图
+  }
+
+</script>
+
+</body>
+</html>
